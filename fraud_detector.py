@@ -141,7 +141,7 @@ if __name__ == "__main__":
      any(celebrity in string_data for celebrity in celebrities_not_givingaway_money)):
      potential_giveaway_impersonation = True
      if (potential_giveaway_impersonation):
-         print ("Pontential impersonation detected")
+         print ("Potential impersonation detected")
      else:
          print ("Video seems fine")
 
