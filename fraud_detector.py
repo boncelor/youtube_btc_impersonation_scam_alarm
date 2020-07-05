@@ -41,11 +41,12 @@ service = build('youtube', 'v3', developerKey=params[1])
 # This method extracts title, description, one thumbnail and the number of views from a video id
 def get_metadata(id):
   collection = service.videos().list(part= 'snippet, statistics',id = fraudulent_video_id).execute()
-  title = collection['items'][0]['snippet']['channelTitle']
+  title = collection['items'][0]['snippet']['title']
+  channel_title = collection['items'][0]['snippet']['channelTitle']
   description = collection['items'][0]['snippet']['description']
   views = collection['items'][0]['statistics']['viewCount']
   thumbnail = collection['items'][0]['snippet']['thumbnails']['medium']['url']
-  return {'title': title, 'description': description, 'thumbnail': thumbnail, 'views': views,}
+  return {'title': title, 'description': description, 'thumbnail': thumbnail, 'views': views, 'channel_title': channel_title}
 
 
 def download_youtube_video(id):
@@ -62,7 +63,7 @@ def extract_frames(id, max_frames_limit=None):
     cv2.imwrite("/var/data/frame%d.jpg" % count, image)     # save frame as JPEG file      
     success,image = vidcap.read()
     count += 1
-    max_frames = false if max_frames_limit == None else count>=max_frames_limit
+    max_frames = False if max_frames_limit == None else count>=max_frames_limit
 
 
 
@@ -120,11 +121,13 @@ if __name__ == "__main__":
   first_frame_text = pytesseract.image_to_string(gray_first_frame, config=custom_config)
 
   string_data = " ".join([
-                 metadata['title'].lower(),
-                 metadata['description'].lower(),
+                 metadata['title'].lower().replace("\u200b", ""),
+                 metadata['channel_title'].lower().replace("\u200b", ""),
+                 metadata['description'].lower().replace("\u200b", ""),
                  thumbnail_text.lower().replace("\n", " "),
                  first_frame_text.lower().replace("\n", " ")])
 
+  print(string_data)
   # Lets be fair and asume not everyone is a scammer
   potential_giveaway_impersonation = False
 
